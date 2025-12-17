@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: tracking-service
+
+  datasource:
+    url: jdbc:mariadb://10.210.40.40:3306/tracking_db
+    username: kyc_uat
+    password: ILoveKYC
+    driver-class-name: org.mariadb.jdbc.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+    open-in-view: false
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level traceId=%X{traceId} %logger{36} - %msg%n"
+
+tracking:
+  session:
+    timeout-minutes: 30
