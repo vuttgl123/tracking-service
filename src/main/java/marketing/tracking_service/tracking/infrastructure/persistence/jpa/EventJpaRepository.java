@@ -2,14 +2,22 @@ package marketing.tracking_service.tracking.infrastructure.persistence.jpa;
 
 import marketing.tracking_service.tracking.infrastructure.persistence.entity.EventEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 public interface EventJpaRepository extends JpaRepository<EventEntity, Long> {
 
-    @Query("select e.eventId from EventEntity e where e.sessionId = :sid and e.clientEventId = :cid")
-    Optional<Long> findIdBySessionIdAndClientEventId(@Param("sid") String sessionId,
-                                                     @Param("cid") String clientEventId);
+    Optional<EventEntity> findBySessionIdAndClientEventId(String sessionId, String clientEventId);
+
+    boolean existsBySessionIdAndClientEventId(String sessionId, String clientEventId);
+
+    List<EventEntity> findBySessionIdOrderByEventAtAsc(String sessionId);
+
+    List<EventEntity> findByVisitorIdAndEventAtBetween(String visitorId, Instant from, Instant to);
+
+    long countBySessionId(String sessionId);
+
+    long countBySessionIdAndEventType(String sessionId, String eventType);
 }

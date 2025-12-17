@@ -1,37 +1,73 @@
 package marketing.tracking_service.tracking.infrastructure.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.Instant;
 
 @Entity
 @Table(name = "sessions")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SessionEntity {
+
     @Id
     @Column(name = "session_id", length = 26, nullable = false)
-    public String sessionId;
+    private String sessionId;
 
     @Column(name = "visitor_id", length = 26, nullable = false)
-    public String visitorId;
+    private String visitorId;
 
     @Column(name = "started_at", nullable = false)
-    public Instant startedAt;
+    private Instant startedAt;
 
     @Column(name = "ended_at")
-    public Instant endedAt;
+    private Instant endedAt;
+
+    @Column(name = "last_activity_at")
+    private Instant lastActivityAt;
 
     @Column(name = "ip_hash", length = 64)
-    public String ipHash;
+    private String ipHash;
 
     @Column(name = "user_agent", length = 400)
-    public String userAgent;
+    private String userAgent;
+
+    @Column(name = "device_type", length = 20)
+    @Enumerated(EnumType.STRING)
+    private DeviceTypeEnum deviceType;
+
+    @Column(name = "browser", length = 50)
+    private String browser;
+
+    @Column(name = "browser_version", length = 20)
+    private String browserVersion;
+
+    @Column(name = "os", length = 50)
+    private String os;
+
+    @Column(name = "os_version", length = 20)
+    private String osVersion;
+
+    @Column(name = "screen_width")
+    private Integer screenWidth;
+
+    @Column(name = "screen_height")
+    private Integer screenHeight;
+
+    @Column(name = "language", length = 10)
+    private String language;
+
+    @Column(name = "timezone", length = 50)
+    private String timezone;
 
     @Column(name = "referrer_url", length = 500)
-    public String referrerUrl;
+    private String referrerUrl;
 
     @Column(name = "landing_url", length = 500)
-    public String landingUrl;
+    private String landingUrl;
 }
+

@@ -1,5 +1,7 @@
 package marketing.tracking_service.tracking.infrastructure.outbox;
 
+import marketing.tracking_service.tracking.infrastructure.persistence.entity.OutboxMessageEntity;
+
 public interface OutboxPublisher {
-    void publish(String eventType, String payloadJson) throws Exception;
+    void publish(OutboxMessageEntity message) throws Exception;
 }

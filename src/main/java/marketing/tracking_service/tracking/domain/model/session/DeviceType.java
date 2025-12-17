@@ -1,6 +1,6 @@
 package marketing.tracking_service.tracking.domain.model.session;
 
-enum DeviceType {
+public enum DeviceType {
     MOBILE,
     TABLET,
     DESKTOP,

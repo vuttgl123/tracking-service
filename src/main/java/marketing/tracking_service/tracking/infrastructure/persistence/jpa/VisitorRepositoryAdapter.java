@@ -1,51 +1,46 @@
 package marketing.tracking_service.tracking.infrastructure.persistence.jpa;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
+import marketing.tracking_service.tracking.domain.model.visitor.Visitor;
 import marketing.tracking_service.tracking.domain.model.visitor.VisitorId;
 import marketing.tracking_service.tracking.domain.model.visitor.VisitorRepository;
-import marketing.tracking_service.tracking.infrastructure.persistence.entity.VisitorEntity;
+import marketing.tracking_service.tracking.infrastructure.persistence.mapper.VisitorMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Clock;
-import java.time.Instant;
 import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class VisitorRepositoryAdapter implements VisitorRepository {
-    private final VisitorJpaRepository jpa;
-    private final Clock clock;
 
-    @PersistenceContext
-    private EntityManager em;
+    private final VisitorJpaRepository jpaRepository;
+    private final VisitorMapper mapper;
 
-    public VisitorRepositoryAdapter(VisitorJpaRepository jpa, Clock clock) {
-        this.jpa = jpa;
-        this.clock = clock;
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Visitor> findById(VisitorId id) {
+        return jpaRepository.findById(id.value())
+                .map(mapper::toDomain);
     }
 
     @Override
-    public Optional<VisitorId> findById(VisitorId id) {
-        return jpa.findById(id.value()).map(v -> new VisitorId(v.visitorId));
+    @Transactional(readOnly = true)
+    public boolean existsById(VisitorId id) {
+        return jpaRepository.existsById(id.value());
     }
 
+    @Override
     @Transactional
-    public void createIfNotExists(VisitorId id, String userAgent) {
-        em.createNativeQuery("""
-    INSERT IGNORE INTO visitors (visitor_id, first_seen_at, last_seen_at, user_agent)
-    VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)
-  """)
-                .setParameter(1, id.value())
-                .setParameter(2, userAgent)
-                .executeUpdate();
+    public Visitor save(Visitor visitor) {
+        var entity = mapper.toEntity(visitor);
+        var saved = jpaRepository.save(entity);
+        return mapper.toDomain(saved);
     }
 
     @Override
-    public void touchLastSeen(VisitorId id) {
-        jpa.findById(id.value()).ifPresent(v -> {
-            v.lastSeenAt = clock.instant();
-            jpa.save(v);
-        });
+    @Transactional
+    public void delete(VisitorId id) {
+        jpaRepository.deleteById(id.value());
     }
 }
