@@ -58,6 +58,30 @@ public class Visitor extends AggregateRoot<VisitorId> {
         return new Visitor(id, firstSeenAt, firstReferrer, firstLandingPage, userAgent);
     }
 
+    public static Visitor reconstruct(
+            VisitorId id,
+            Instant firstSeenAt,
+            Instant lastSeenAt,
+            int totalSessions,
+            int totalPageViews,
+            int totalEvents,
+            String firstReferrer,
+            String firstLandingPage,
+            String userAgent
+    ) {
+        Visitor visitor = new Visitor();
+        visitor.setId(id);
+        visitor.firstSeenAt = firstSeenAt;
+        visitor.lastSeenAt = lastSeenAt;
+        visitor.totalSessions = totalSessions;
+        visitor.totalPageViews = totalPageViews;
+        visitor.totalEvents = totalEvents;
+        visitor.firstReferrer = firstReferrer;
+        visitor.firstLandingPage = firstLandingPage;
+        visitor.userAgent = userAgent;
+        return visitor;
+    }
+
     public void markAsSeen() {
         this.lastSeenAt = Instant.now();
         applyStateChange();

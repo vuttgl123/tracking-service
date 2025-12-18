@@ -1,6 +1,5 @@
 package marketing.tracking_service.shared.domain;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,15 +7,16 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
+
 @Getter
 public abstract class Entity<ID> implements Serializable {
-    @Setter(AccessLevel.PROTECTED)
+    @Setter
     private ID id;
 
-    @Setter(AccessLevel.PROTECTED)
+    @Setter
     private Instant createdAt;
 
-    @Setter(AccessLevel.PROTECTED)
+    @Setter
     private Instant updatedAt;
 
     protected Entity() {

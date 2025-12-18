@@ -10,12 +10,25 @@ public record VisitorId(String value) implements ValueObject {
 
     public VisitorId {
         Objects.requireNonNull(value, "Visitor ID cannot be null");
-        if (value.isBlank() || value.length() != ULID_LENGTH) {
-            throw new IllegalArgumentException("Invalid visitor ID format");
+        if (value.isBlank()) {
+            throw new IllegalArgumentException("Visitor ID cannot be blank");
+        }
+        if (value.length() != ULID_LENGTH) {
+            throw new IllegalArgumentException(
+                    String.format("Invalid visitor ID format. Expected length: %d, got: %d",
+                            ULID_LENGTH, value.length())
+            );
         }
     }
 
     public static VisitorId from(String value) {
+        return new VisitorId(value);
+    }
+
+    public static VisitorId fromOrNull(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
         return new VisitorId(value);
     }
 

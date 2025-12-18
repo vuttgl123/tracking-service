@@ -1,10 +1,7 @@
 package marketing.tracking_service.tracking.infrastructure.persistence.mapper;
 
 import marketing.tracking_service.tracking.domain.model.session.*;
-import marketing.tracking_service.tracking.domain.model.session.DeviceType;
 import marketing.tracking_service.tracking.domain.model.visitor.VisitorId;
-
-
 import marketing.tracking_service.tracking.infrastructure.persistence.entity.DeviceTypeEnum;
 import marketing.tracking_service.tracking.infrastructure.persistence.entity.SessionEntity;
 import org.springframework.stereotype.Component;
@@ -51,10 +48,12 @@ public class SessionMapper {
                 .timezone(entity.getTimezone())
                 .build();
 
-        Session session = Session.start(
+        Session session = Session.reconstruct(
                 SessionId.from(entity.getSessionId()),
                 VisitorId.from(entity.getVisitorId()),
                 entity.getStartedAt(),
+                entity.getEndedAt(),
+                entity.getLastActivityAt(),
                 entity.getIpHash() != null ? IpHash.from(entity.getIpHash()) : null,
                 entity.getUserAgent(),
                 deviceInfo,
@@ -63,7 +62,6 @@ public class SessionMapper {
         );
 
         session.clearDomainEvents();
-
         return session;
     }
 

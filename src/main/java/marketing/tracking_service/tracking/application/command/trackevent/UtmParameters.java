@@ -3,7 +3,7 @@ package marketing.tracking_service.tracking.application.command.trackevent;
 import lombok.Builder;
 
 @Builder
-record UtmParameters(
+public record UtmParameters(
         String source,
         String medium,
         String campaign,

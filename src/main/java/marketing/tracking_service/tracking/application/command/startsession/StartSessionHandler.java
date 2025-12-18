@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -72,15 +73,13 @@ public class StartSessionHandler implements CommandHandler<StartSessionCommand, 
     }
 
     private VisitorId resolveVisitorId(String visitorIdStr) {
-        return visitorIdStr != null && !visitorIdStr.isBlank()
-                ? VisitorId.from(visitorIdStr)
-                : VisitorId.from(idGenerator.newId());
+        VisitorId visitorId = VisitorId.fromOrNull(visitorIdStr);
+        return visitorId != null ? visitorId : VisitorId.from(idGenerator.newId());
     }
 
     private SessionId resolveSessionId(String sessionIdStr) {
-        return sessionIdStr != null && !sessionIdStr.isBlank()
-                ? SessionId.from(sessionIdStr)
-                : SessionId.from(idGenerator.newId());
+        SessionId sessionId = SessionId.fromOrNull(sessionIdStr);
+        return sessionId != null ? sessionId : SessionId.from(idGenerator.newId());
     }
 
     private Visitor getOrCreateVisitor(VisitorId visitorId, StartSessionCommand cmd) {
@@ -101,4 +100,3 @@ public class StartSessionHandler implements CommandHandler<StartSessionCommand, 
                 });
     }
 }
-

@@ -15,6 +15,8 @@ public interface EventJpaRepository extends JpaRepository<EventEntity, Long> {
 
     List<EventEntity> findBySessionIdOrderByEventAtAsc(String sessionId);
 
+    List<EventEntity> findBySessionIdOrderByEventAtDesc(String sessionId);
+
     List<EventEntity> findByVisitorIdAndEventAtBetween(String visitorId, Instant from, Instant to);
 
     long countBySessionId(String sessionId);

@@ -80,6 +80,32 @@ public class Session extends AggregateRoot<SessionId> {
         );
     }
 
+    public static Session reconstruct(
+            SessionId id,
+            VisitorId visitorId,
+            Instant startedAt,
+            Instant endedAt,
+            Instant lastActivityAt,
+            IpHash ipHash,
+            String userAgent,
+            DeviceInfo deviceInfo,
+            String referrerUrl,
+            String landingUrl
+    ) {
+        Session session = new Session();
+        session.setId(id);
+        session.visitorId = visitorId;
+        session.startedAt = startedAt;
+        session.endedAt = endedAt;
+        session.lastActivityAt = lastActivityAt;
+        session.ipHash = ipHash;
+        session.userAgent = userAgent;
+        session.deviceInfo = deviceInfo;
+        session.referrerUrl = referrerUrl;
+        session.landingUrl = landingUrl;
+        return session;
+    }
+
     public void recordActivity(Instant activityAt) {
         if (isEnded()) {
             throw new IllegalStateException("Cannot record activity on ended session");

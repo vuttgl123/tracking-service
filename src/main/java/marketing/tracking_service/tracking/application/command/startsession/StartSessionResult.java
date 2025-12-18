@@ -4,7 +4,7 @@ import marketing.tracking_service.shared.application.Result;
 
 import java.time.Instant;
 
-record StartSessionResult(
+public record StartSessionResult(
         String visitorId,
         String sessionId,
         Instant startedAt

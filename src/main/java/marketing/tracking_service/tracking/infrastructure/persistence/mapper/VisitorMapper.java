@@ -23,16 +23,19 @@ public class VisitorMapper {
     }
 
     public Visitor toDomain(VisitorEntity entity) {
-        Visitor visitor = Visitor.create(
+        Visitor visitor = Visitor.reconstruct(
                 VisitorId.from(entity.getVisitorId()),
                 entity.getFirstSeenAt(),
+                entity.getLastSeenAt(),
+                entity.getTotalSessions(),
+                entity.getTotalPageViews(),
+                entity.getTotalEvents(),
                 entity.getFirstReferrer(),
                 entity.getFirstLandingPage(),
                 entity.getUserAgent()
         );
 
         visitor.clearDomainEvents();
-
         return visitor;
     }
 }

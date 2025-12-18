@@ -1,44 +1,71 @@
 package marketing.tracking_service.tracking.inter.rest.mapper;
 
 import marketing.tracking_service.tracking.application.command.trackevent.TrackEventCommand;
-import marketing.tracking_service.tracking.domain.model.attribution.UtmData;
+import marketing.tracking_service.tracking.application.command.trackevent.UtmParameters;
+import marketing.tracking_service.tracking.domain.model.event.TrackingEventType;
 import marketing.tracking_service.tracking.inter.rest.dto.TrackEventRequest;
+import marketing.tracking_service.tracking.inter.rest.dto.UtmDto;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
 
 @Component
 public class TrackEventRequestMapper {
 
-    public TrackEventCommand toCommand(
-            String traceId,
-            String visitorId,
-            String sessionId,
-            String clientEventId,
-            String metaJson,
-            UtmData utm,
-            TrackEventRequest req
-    ) {
-        return new TrackEventCommand(
-                traceId,
-                visitorId,
-                sessionId,
-                req.eventType(),
-                clientEventId,
-                (Instant) null,
-                req.ipHash(),
-                req.userAgent(),
-                req.pageUrl(),
-                req.pageTitle(),
-                req.referrerUrl(),
-                req.landingUrl(),
-                metaJson,
-                utm
-        );
+    public TrackEventCommand toCommand(TrackEventRequest request, String resolvedIpAddress, String resolvedUserAgent) {
+        return TrackEventCommand.builder()
+                .visitorId(request.visitorId())
+                .sessionId(request.sessionId())
+                .clientEventId(request.clientEventId())
+                .eventType(parseEventType(request.eventType()))
+                .eventAt(request.eventAt())
+                .ipAddress(request.ipAddress() != null ? request.ipAddress() : resolvedIpAddress)
+                .userAgent(request.userAgent() != null ? request.userAgent() : resolvedUserAgent)
+                .screenWidth(request.screenWidth())
+                .screenHeight(request.screenHeight())
+                .language(request.language())
+                .timezone(request.timezone())
+                .pageUrl(request.pageUrl())
+                .pageTitle(request.pageTitle())
+                .referrerUrl(request.referrerUrl())
+                .landingUrl(request.landingUrl())
+                .scrollDepth(request.scrollDepth())
+                .timeOnPage(request.timeOnPage())
+                .viewportWidth(request.viewportWidth())
+                .viewportHeight(request.viewportHeight())
+                .elementId(request.elementId())
+                .elementClass(request.elementClass())
+                .elementText(request.elementText())
+                .metadata(request.metadata())
+                .utm(mapUtm(request.utm()))
+                .build();
     }
 
-    public UtmData toUtm(TrackEventRequest.UtmDto u) {
-        if (u == null) return null;
-        return new UtmData(u.source(), u.medium(), u.campaign(), u.term(), u.content(), u.clickId());
+    private TrackingEventType parseEventType(String eventType) {
+        if (eventType == null) {
+            throw new IllegalArgumentException("event_type is required");
+        }
+
+        try {
+            return TrackingEventType.valueOf(eventType.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid event_type: " + eventType);
+        }
+    }
+
+    private UtmParameters mapUtm(UtmDto utm) {
+        if (utm == null) {
+            return null;
+        }
+
+        return UtmParameters.builder()
+                .source(utm.source())
+                .medium(utm.medium())
+                .campaign(utm.campaign())
+                .content(utm.content())
+                .term(utm.term())
+                .clickId(utm.clickId())
+                .gclid(utm.gclid())
+                .fbclid(utm.fbclid())
+                .referrerDomain(utm.referrerDomain())
+                .build();
     }
 }

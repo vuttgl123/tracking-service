@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@ConditionalOnMissingBean(OutboxPublisher.class)
+//@ConditionalOnMissingBean(OutboxPublisher.class)
 public class LogOutboxPublisher implements OutboxPublisher {
 
     @Override

@@ -49,22 +49,30 @@ public class TrackingEventRepositoryAdapter implements TrackingEventRepository {
         try {
             var entity = mapper.toEntity(event);
             var saved = jpaRepository.saveAndFlush(entity);
-            return mapper.toDomain(saved);
-        } catch (DataIntegrityViolationException e) {
-            if (isDuplicateKeyException(e)) {
+
+            TrackingEvent domainEvent = mapper.toDomain(saved);
+
+            if (!domainEvent.isPersisted()) {
+                domainEvent.markAsPersisted(saved.getEventId());
+            }
+
+            return domainEvent;
+
+        } catch (DataIntegrityViolationException ex) {
+            if (isDuplicateKeyException(ex)) {
                 throw new DuplicateEventException(
                         event.getSessionId().value(),
                         event.getClientEventId()
                 );
             }
-            throw e;
+            throw ex;
         }
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<TrackingEvent> findBySession(SessionId sessionId) {
-        return jpaRepository.findBySessionIdOrderByEventAtAsc(sessionId.value())
+        return jpaRepository.findBySessionIdOrderByEventAtDesc(sessionId.value())
                 .stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
@@ -95,7 +103,8 @@ public class TrackingEventRepositoryAdapter implements TrackingEventRepository {
         Throwable cause = ex;
         while (cause != null) {
             String message = cause.getMessage();
-            if (message != null && message.contains("Duplicate entry") &&
+            if (message != null &&
+                    message.contains("Duplicate entry") &&
                     message.contains("uk_session_client_event")) {
                 return true;
             }

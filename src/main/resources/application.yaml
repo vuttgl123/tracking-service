@@ -17,12 +17,42 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MariaDBDialect
+        format_sql: false
+        show_sql: false
+        jdbc:
+          batch_size: 20
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
     open-in-view: false
 
-logging:
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level traceId=%X{traceId} %logger{36} - %msg%n"
+server:
+  port: 8080
+  compression:
+    enabled: true
+  http2:
+    enabled: true
 
 tracking:
   session:
     timeout-minutes: 30
+
+  cors:
+    allowed-origins: "*"
+    max-age: 3600
+
+  outbox:
+    publisher:
+      enabled: true
+      interval-ms: 5000
+    cleanup:
+      cron: "0 0 2 * * ?"
+
+logging:
+  level:
+    root: INFO
+    marketing.tracking_service: DEBUG
+    org.springframework.web: INFO
+    org.hibernate: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

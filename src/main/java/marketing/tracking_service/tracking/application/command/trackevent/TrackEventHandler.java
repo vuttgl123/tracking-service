@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import marketing.tracking_service.shared.application.CommandHandler;
 import marketing.tracking_service.shared.domain.DomainEventPublisher;
 import marketing.tracking_service.shared.domain.IdGenerator;
+import marketing.tracking_service.tracking.application.command.startsession.DeviceDetectionService;
 import marketing.tracking_service.tracking.domain.event.DuplicateEventException;
 import marketing.tracking_service.tracking.domain.model.attribution.*;
 import marketing.tracking_service.tracking.domain.model.event.*;
@@ -41,6 +42,7 @@ public class TrackEventHandler implements CommandHandler<TrackEventCommand, Trac
         SessionId sessionId = resolveSessionId(cmd.sessionId());
 
         Visitor visitor = getOrCreateVisitor(visitorId, cmd);
+        Visitor savedVisitor = visitorRepository.save(visitor);
 
         IpHash ipHash = cmd.ipAddress() != null
                 ? IpHash.fromIpAddress(cmd.ipAddress())
@@ -72,7 +74,6 @@ public class TrackEventHandler implements CommandHandler<TrackEventCommand, Trac
 
         try {
             TrackingEvent savedEvent = eventRepository.save(event);
-            savedEvent.markAsPersisted(savedEvent.getId());
 
             sessionLifecycle.recordActivity(session.getId());
             visitor.incrementEvents(1);
@@ -116,15 +117,13 @@ public class TrackEventHandler implements CommandHandler<TrackEventCommand, Trac
     }
 
     private VisitorId resolveVisitorId(String visitorIdStr) {
-        return visitorIdStr != null && !visitorIdStr.isBlank()
-                ? VisitorId.from(visitorIdStr)
-                : VisitorId.from(idGenerator.newId());
+        VisitorId visitorId = VisitorId.fromOrNull(visitorIdStr);
+        return visitorId != null ? visitorId : VisitorId.from(idGenerator.newId());
     }
 
     private SessionId resolveSessionId(String sessionIdStr) {
-        return sessionIdStr != null && !sessionIdStr.isBlank()
-                ? SessionId.from(sessionIdStr)
-                : SessionId.from(idGenerator.newId());
+        SessionId sessionId = SessionId.fromOrNull(sessionIdStr);
+        return sessionId != null ? sessionId : SessionId.from(idGenerator.newId());
     }
 
     private Visitor getOrCreateVisitor(VisitorId visitorId, TrackEventCommand cmd) {
@@ -220,4 +219,3 @@ public class TrackEventHandler implements CommandHandler<TrackEventCommand, Trac
                 );
     }
 }
-
