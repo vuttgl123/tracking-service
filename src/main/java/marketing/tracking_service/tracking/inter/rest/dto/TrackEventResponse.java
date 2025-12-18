@@ -5,7 +5,6 @@ import lombok.Builder;
 
 @Builder
 public record TrackEventResponse(
-
         @JsonProperty("visitor_id")
         String visitorId,
 
@@ -25,13 +24,7 @@ public record TrackEventResponse(
         String status
 ) {
 
-    public static TrackEventResponse success(
-            String visitorId,
-            String sessionId,
-            Long eventId,
-            String clientEventId,
-            boolean isDuplicate
-    ) {
+    public static TrackEventResponse success(String visitorId, String sessionId, Long eventId, String clientEventId, boolean isDuplicate) {
         return TrackEventResponse.builder()
                 .visitorId(visitorId)
                 .sessionId(sessionId)

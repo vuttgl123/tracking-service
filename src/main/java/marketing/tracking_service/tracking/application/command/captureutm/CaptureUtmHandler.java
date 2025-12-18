@@ -16,7 +16,6 @@ import java.time.Instant;
 @Service
 @RequiredArgsConstructor
 class CaptureUtmHandler implements CommandHandler<CaptureUtmCommand, CaptureUtmResult> {
-
     private final UtmAttributionRepository utmRepository;
     private final Clock clock;
 
@@ -46,9 +45,7 @@ class CaptureUtmHandler implements CommandHandler<CaptureUtmCommand, CaptureUtmR
         boolean firstTouchCaptured = captureFirstTouch(sessionId, visitorId, utmData, now);
         boolean lastTouchCaptured = captureLastTouch(sessionId, visitorId, utmData, now);
 
-        log.info("UTM captured: sessionId={}, firstTouch={}, lastTouch={}",
-                sessionId, firstTouchCaptured, lastTouchCaptured);
-
+        log.info("UTM captured: sessionId={}, firstTouch={}, lastTouch={}", sessionId, firstTouchCaptured, lastTouchCaptured);
         return new CaptureUtmResult(firstTouchCaptured, lastTouchCaptured);
     }
 
@@ -57,12 +54,7 @@ class CaptureUtmHandler implements CommandHandler<CaptureUtmCommand, CaptureUtmR
             return false;
         }
 
-        UtmAttribution firstTouch = UtmAttribution.captureFirstTouch(
-                sessionId,
-                visitorId,
-                utmData,
-                now
-        );
+        UtmAttribution firstTouch = UtmAttribution.captureFirstTouch(sessionId, visitorId, utmData, now);
         utmRepository.save(firstTouch);
         return true;
     }

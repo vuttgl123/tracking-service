@@ -18,7 +18,6 @@ import java.util.List;
         matchIfMissing = true
 )
 public class OutboxPublisherJob {
-
     private final OutboxService outboxService;
     private final OutboxPublisher outboxPublisher;
 
@@ -30,17 +29,14 @@ public class OutboxPublisherJob {
             if (messages.isEmpty()) {
                 return;
             }
-
             log.debug("Processing {} outbox messages", messages.size());
-
             for (OutboxMessageEntity message : messages) {
                 try {
                     outboxPublisher.publish(message);
                     outboxService.markAsSent(message.outboxId);
 
                 } catch (Exception e) {
-                    log.error("Failed to publish outbox message: id={}",
-                            message.outboxId, e);
+                    log.error("Failed to publish outbox message: id={}", message.outboxId, e);
                     outboxService.markAsFailed(message.outboxId, e.getMessage());
                 }
             }

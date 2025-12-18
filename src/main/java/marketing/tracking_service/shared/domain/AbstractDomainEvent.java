@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.UUID;
 
 abstract class AbstractDomainEvent implements DomainEvent {
-
     private final String eventId;
     private final Instant occurredAt;
     private final String version;
@@ -43,7 +42,6 @@ abstract class AbstractDomainEvent implements DomainEvent {
 
     @Override
     public String toString() {
-        return String.format("%s[id=%s, occurredAt=%s]",
-                eventType(), eventId, occurredAt);
+        return String.format("%s[id=%s, occurredAt=%s]", eventType(), eventId, occurredAt);
     }
 }

@@ -12,7 +12,6 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Visitor extends AggregateRoot<VisitorId> {
-
     private Instant firstSeenAt;
     private Instant lastSeenAt;
     private int totalSessions;
@@ -22,13 +21,7 @@ public class Visitor extends AggregateRoot<VisitorId> {
     private String firstLandingPage;
     private String userAgent;
 
-    private Visitor(
-            VisitorId id,
-            Instant firstSeenAt,
-            String firstReferrer,
-            String firstLandingPage,
-            String userAgent
-    ) {
+    private Visitor(VisitorId id, Instant firstSeenAt, String firstReferrer, String firstLandingPage, String userAgent) {
         super(id);
         this.firstSeenAt = Objects.requireNonNull(firstSeenAt);
         this.lastSeenAt = firstSeenAt;
@@ -39,36 +32,14 @@ public class Visitor extends AggregateRoot<VisitorId> {
         this.firstLandingPage = firstLandingPage;
         this.userAgent = userAgent;
 
-        registerEvent(VisitorFirstSeen.of(
-                id.value(),
-                firstSeenAt,
-                firstReferrer,
-                firstLandingPage,
-                userAgent
-        ));
+        registerEvent(VisitorFirstSeen.of(id.value(), firstSeenAt, firstReferrer, firstLandingPage, userAgent));
     }
 
-    public static Visitor create(
-            VisitorId id,
-            Instant firstSeenAt,
-            String firstReferrer,
-            String firstLandingPage,
-            String userAgent
-    ) {
+    public static Visitor create(VisitorId id, Instant firstSeenAt, String firstReferrer, String firstLandingPage, String userAgent) {
         return new Visitor(id, firstSeenAt, firstReferrer, firstLandingPage, userAgent);
     }
 
-    public static Visitor reconstruct(
-            VisitorId id,
-            Instant firstSeenAt,
-            Instant lastSeenAt,
-            int totalSessions,
-            int totalPageViews,
-            int totalEvents,
-            String firstReferrer,
-            String firstLandingPage,
-            String userAgent
-    ) {
+    public static Visitor reconstruct(VisitorId id, Instant firstSeenAt, Instant lastSeenAt, int totalSessions, int totalPageViews, int totalEvents, String firstReferrer, String firstLandingPage, String userAgent) {
         Visitor visitor = new Visitor();
         visitor.setId(id);
         visitor.firstSeenAt = firstSeenAt;

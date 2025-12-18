@@ -8,18 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EventJpaRepository extends JpaRepository<EventEntity, Long> {
-
     Optional<EventEntity> findBySessionIdAndClientEventId(String sessionId, String clientEventId);
-
     boolean existsBySessionIdAndClientEventId(String sessionId, String clientEventId);
-
     List<EventEntity> findBySessionIdOrderByEventAtAsc(String sessionId);
-
     List<EventEntity> findBySessionIdOrderByEventAtDesc(String sessionId);
-
     List<EventEntity> findByVisitorIdAndEventAtBetween(String visitorId, Instant from, Instant to);
-
     long countBySessionId(String sessionId);
-
     long countBySessionIdAndEventType(String sessionId, String eventType);
 }

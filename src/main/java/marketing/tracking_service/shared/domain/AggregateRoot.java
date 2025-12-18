@@ -58,8 +58,7 @@ public abstract class AggregateRoot<ID> extends Entity<ID> {
 
     @Override
     public String toString() {
-        return String.format("%s[id=%s, version=%d]",
-                getClass().getSimpleName(), getId(), version);
+        return String.format("%s[id=%s, version=%d]", getClass().getSimpleName(), getId(), version);
     }
 }
 

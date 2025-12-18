@@ -42,11 +42,9 @@ public abstract class Entity<ID> implements Serializable {
         if (obj == null || getClass() != obj.getClass()) return false;
 
         Entity<?> other = (Entity<?>) obj;
-
         if (!this.isPersisted() || !other.isPersisted()) {
             return false;
         }
-
         return Objects.equals(this.id, other.id);
     }
 

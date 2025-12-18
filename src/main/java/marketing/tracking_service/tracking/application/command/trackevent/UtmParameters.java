@@ -15,7 +15,6 @@ public record UtmParameters(
         String referrerDomain
 ) {
     public boolean hasAnyParameter() {
-        return source != null || medium != null || campaign != null
-                || clickId != null || gclid != null || fbclid != null;
+        return source != null || medium != null || campaign != null || clickId != null || gclid != null || fbclid != null;
     }
 }

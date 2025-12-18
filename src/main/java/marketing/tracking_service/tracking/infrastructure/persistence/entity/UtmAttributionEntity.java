@@ -13,7 +13,6 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 public class UtmAttributionEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "utm_id")

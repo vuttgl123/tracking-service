@@ -4,6 +4,5 @@ import java.util.List;
 
 interface AsyncDomainEventPublisher extends DomainEventPublisher {
     void publishAsync(DomainEvent event);
-
     void publishAllAsync(List<DomainEvent> events);
 }

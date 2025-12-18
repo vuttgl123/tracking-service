@@ -9,7 +9,6 @@ import java.util.HexFormat;
 import java.util.Objects;
 
 public record IpHash(String value) implements ValueObject {
-
     private static final int SHA256_LENGTH = 64;
     private static final String ALGORITHM = "SHA-256";
 

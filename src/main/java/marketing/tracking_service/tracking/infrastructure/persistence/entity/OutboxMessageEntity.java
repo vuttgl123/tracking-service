@@ -9,7 +9,6 @@ import java.time.Instant;
 @Entity
 @Table(name = "outbox_messages")
 public class OutboxMessageEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "outbox_id")

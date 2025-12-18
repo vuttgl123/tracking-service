@@ -13,20 +13,13 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UtmAttribution extends AggregateRoot<Long> {
-
     private SessionId sessionId;
     private VisitorId visitorId;
     private UtmData utmData;
     private TouchType touchType;
     private Instant capturedAt;
 
-    private UtmAttribution(
-            SessionId sessionId,
-            VisitorId visitorId,
-            UtmData utmData,
-            TouchType touchType,
-            Instant capturedAt
-    ) {
+    private UtmAttribution(SessionId sessionId, VisitorId visitorId, UtmData utmData, TouchType touchType, Instant capturedAt) {
         super();
         this.sessionId = sessionId;
         this.visitorId = visitorId;
@@ -35,31 +28,15 @@ public class UtmAttribution extends AggregateRoot<Long> {
         this.capturedAt = Objects.requireNonNull(capturedAt);
     }
 
-    public static UtmAttribution capture(
-            SessionId sessionId,
-            VisitorId visitorId,
-            UtmData utmData,
-            TouchType touchType,
-            Instant capturedAt
-    ) {
+    public static UtmAttribution capture(SessionId sessionId, VisitorId visitorId, UtmData utmData, TouchType touchType, Instant capturedAt) {
         return new UtmAttribution(sessionId, visitorId, utmData, touchType, capturedAt);
     }
 
-    public static UtmAttribution captureFirstTouch(
-            SessionId sessionId,
-            VisitorId visitorId,
-            UtmData utmData,
-            Instant capturedAt
-    ) {
+    public static UtmAttribution captureFirstTouch(SessionId sessionId, VisitorId visitorId, UtmData utmData, Instant capturedAt) {
         return capture(sessionId, visitorId, utmData, TouchType.FIRST, capturedAt);
     }
 
-    public static UtmAttribution captureLastTouch(
-            SessionId sessionId,
-            VisitorId visitorId,
-            UtmData utmData,
-            Instant capturedAt
-    ) {
+    public static UtmAttribution captureLastTouch(SessionId sessionId, VisitorId visitorId, UtmData utmData, Instant capturedAt) {
         return capture(sessionId, visitorId, utmData, TouchType.LAST, capturedAt);
     }
 

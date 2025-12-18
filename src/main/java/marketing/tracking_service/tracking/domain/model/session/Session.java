@@ -14,7 +14,6 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Session extends AggregateRoot<SessionId> {
-
     private static final Duration DEFAULT_TIMEOUT = Duration.ofMinutes(30);
 
     private VisitorId visitorId;
@@ -27,16 +26,7 @@ public class Session extends AggregateRoot<SessionId> {
     private String referrerUrl;
     private String landingUrl;
 
-    private Session(
-            SessionId id,
-            VisitorId visitorId,
-            Instant startedAt,
-            IpHash ipHash,
-            String userAgent,
-            DeviceInfo deviceInfo,
-            String referrerUrl,
-            String landingUrl
-    ) {
+    private Session(SessionId id, VisitorId visitorId, Instant startedAt, IpHash ipHash, String userAgent, DeviceInfo deviceInfo, String referrerUrl, String landingUrl) {
         super(id);
         this.visitorId = Objects.requireNonNull(visitorId);
         this.startedAt = Objects.requireNonNull(startedAt);
@@ -47,51 +37,14 @@ public class Session extends AggregateRoot<SessionId> {
         this.referrerUrl = referrerUrl;
         this.landingUrl = landingUrl;
 
-        registerEvent(SessionStarted.of(
-                id.value(),
-                visitorId.value(),
-                startedAt,
-                ipHash != null ? ipHash.value() : null,
-                userAgent,
-                referrerUrl,
-                landingUrl
-        ));
+        registerEvent(SessionStarted.of(id.value(), visitorId.value(), startedAt, ipHash != null ? ipHash.value() : null, userAgent, referrerUrl, landingUrl));
     }
 
-    public static Session start(
-            SessionId id,
-            VisitorId visitorId,
-            Instant startedAt,
-            IpHash ipHash,
-            String userAgent,
-            DeviceInfo deviceInfo,
-            String referrerUrl,
-            String landingUrl
-    ) {
-        return new Session(
-                id,
-                visitorId,
-                startedAt,
-                ipHash,
-                userAgent,
-                deviceInfo,
-                referrerUrl,
-                landingUrl
-        );
+    public static Session start(SessionId id, VisitorId visitorId, Instant startedAt, IpHash ipHash, String userAgent, DeviceInfo deviceInfo, String referrerUrl, String landingUrl) {
+        return new Session(id, visitorId, startedAt, ipHash, userAgent, deviceInfo, referrerUrl, landingUrl);
     }
 
-    public static Session reconstruct(
-            SessionId id,
-            VisitorId visitorId,
-            Instant startedAt,
-            Instant endedAt,
-            Instant lastActivityAt,
-            IpHash ipHash,
-            String userAgent,
-            DeviceInfo deviceInfo,
-            String referrerUrl,
-            String landingUrl
-    ) {
+    public static Session reconstruct(SessionId id, VisitorId visitorId, Instant startedAt, Instant endedAt, Instant lastActivityAt, IpHash ipHash, String userAgent, DeviceInfo deviceInfo, String referrerUrl, String landingUrl) {
         Session session = new Session();
         session.setId(id);
         session.visitorId = visitorId;

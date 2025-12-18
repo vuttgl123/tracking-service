@@ -3,6 +3,7 @@ package marketing.tracking_service.tracking.inter.rest.mapper;
 import marketing.tracking_service.tracking.application.command.trackevent.TrackEventCommand;
 import marketing.tracking_service.tracking.application.command.trackevent.UtmParameters;
 import marketing.tracking_service.tracking.domain.model.event.TrackingEventType;
+import marketing.tracking_service.tracking.inter.http.TrackingContextHolder;
 import marketing.tracking_service.tracking.inter.rest.dto.TrackEventRequest;
 import marketing.tracking_service.tracking.inter.rest.dto.UtmDto;
 import org.springframework.stereotype.Component;
@@ -11,9 +12,10 @@ import org.springframework.stereotype.Component;
 public class TrackEventRequestMapper {
 
     public TrackEventCommand toCommand(TrackEventRequest request, String resolvedIpAddress, String resolvedUserAgent) {
+        var ctx = TrackingContextHolder.get();
         return TrackEventCommand.builder()
-                .visitorId(request.visitorId())
-                .sessionId(request.sessionId())
+                .visitorId(ctx != null ? ctx.getVisitorId() : request.visitorId())
+                .sessionId(ctx != null ? ctx.getSessionId() : request.sessionId())
                 .clientEventId(request.clientEventId())
                 .eventType(parseEventType(request.eventType()))
                 .eventAt(request.eventAt())

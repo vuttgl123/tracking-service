@@ -9,7 +9,6 @@ import java.util.Objects;
 
 @Component
 public class UlidGenerator implements TimeBasedIdGenerator {
-
     private static final char[] CROCKFORD = "0123456789ABCDEFGHJKMNPQRSTVWXYZ".toCharArray();
     private static final int ULID_LENGTH = 26;
     private static final int TIMESTAMP_LENGTH = 10;

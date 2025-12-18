@@ -15,7 +15,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class OutboxService {
-
     private final OutboxJpaRepository outboxRepository;
     private final Clock clock;
 
@@ -32,7 +31,6 @@ public class OutboxService {
         message.createdAt = clock.instant();
 
         outboxRepository.save(message);
-
         log.debug("Outbox message enqueued: type={}, id={}", eventType, aggregateId);
     }
 
@@ -48,7 +46,6 @@ public class OutboxService {
             message.status = OutboxStatus.SENT;
             message.sentAt = clock.instant();
             outboxRepository.save(message);
-
             log.debug("Outbox message marked as sent: id={}", outboxId);
         });
     }
@@ -58,19 +55,14 @@ public class OutboxService {
         outboxRepository.findById(outboxId).ifPresent(message -> {
             message.status = OutboxStatus.FAILED;
             message.retryCount++;
-            message.lastError = error != null && error.length() > 500
-                    ? error.substring(0, 500)
-                    : error;
+            message.lastError = error != null && error.length() > 500 ? error.substring(0, 500) : error;
             message.nextAttemptAt = calculateNextAttempt(message.retryCount);
 
             if (message.retryCount < 5) {
                 message.status = OutboxStatus.NEW;
             }
-
             outboxRepository.save(message);
-
-            log.warn("Outbox message marked as failed: id={}, retryCount={}",
-                    outboxId, message.retryCount);
+            log.warn("Outbox message marked as failed: id={}, retryCount={}", outboxId, message.retryCount);
         });
     }
 

@@ -13,15 +13,13 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class VisitorRepositoryAdapter implements VisitorRepository {
-
     private final VisitorJpaRepository jpaRepository;
     private final VisitorMapper mapper;
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Visitor> findById(VisitorId id) {
-        return jpaRepository.findById(id.value())
-                .map(mapper::toDomain);
+        return jpaRepository.findById(id.value()).map(mapper::toDomain);
     }
 
     @Override

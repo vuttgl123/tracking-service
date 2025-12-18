@@ -3,13 +3,7 @@ package marketing.tracking_service.tracking.inter.rest;
 import java.time.Instant;
 import java.util.Map;
 
-record ErrorResponse(
-        int status,
-        String error,
-        String message,
-        Instant timestamp,
-        Map<String, String> details
-) {
+record ErrorResponse(int status, String error, String message, Instant timestamp, Map<String, String> details) {
     public static ErrorResponseBuilder builder() {
         return new ErrorResponseBuilder();
     }

@@ -10,7 +10,6 @@ import java.time.Instant;
 import java.util.List;
 
 public interface OutboxJpaRepository extends JpaRepository<OutboxMessageEntity, Long> {
-
     @Query("""
         SELECT o FROM OutboxMessageEntity o 
         WHERE o.status = 'NEW' 

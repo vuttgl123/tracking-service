@@ -2,6 +2,7 @@ package marketing.tracking_service.tracking.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import marketing.tracking_service.tracking.infrastructure.persistence.converter.EventTypeEnumConverter;
 
 import java.time.Instant;
 
@@ -13,7 +14,6 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 public class EventEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "event_id")
@@ -29,7 +29,7 @@ public class EventEntity {
     private String clientEventId;
 
     @Column(name = "event_type", length = 30, nullable = false)
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = EventTypeEnumConverter.class)
     private EventTypeEnum eventType;
 
     @Column(name = "event_at", nullable = false)

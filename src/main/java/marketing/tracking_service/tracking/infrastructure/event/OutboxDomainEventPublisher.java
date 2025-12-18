@@ -16,7 +16,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class OutboxDomainEventPublisher implements DomainEventPublisher {
-
     private final OutboxService outboxService;
     private final ObjectMapper objectMapper;
 
@@ -25,16 +24,8 @@ public class OutboxDomainEventPublisher implements DomainEventPublisher {
     public void publish(DomainEvent event) {
         try {
             String payload = objectMapper.writeValueAsString(event);
-
-            outboxService.enqueue(
-                    event.aggregateType(),
-                    event.aggregateId(),
-                    event.eventType(),
-                    payload
-            );
-
-            log.debug("Domain event published to outbox: type={}, aggregateId={}",
-                    event.eventType(), event.aggregateId());
+            outboxService.enqueue(event.aggregateType(), event.aggregateId(), event.eventType(), payload);
+            log.debug("Domain event published to outbox: type={}, aggregateId={}", event.eventType(), event.aggregateId());
 
         } catch (JsonProcessingException e) {
             log.error("Failed to serialize domain event: {}", event.eventType(), e);

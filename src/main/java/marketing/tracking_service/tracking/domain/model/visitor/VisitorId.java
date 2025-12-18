@@ -14,10 +14,7 @@ public record VisitorId(String value) implements ValueObject {
             throw new IllegalArgumentException("Visitor ID cannot be blank");
         }
         if (value.length() != ULID_LENGTH) {
-            throw new IllegalArgumentException(
-                    String.format("Invalid visitor ID format. Expected length: %d, got: %d",
-                            ULID_LENGTH, value.length())
-            );
+            throw new IllegalArgumentException(String.format("Invalid visitor ID format. Expected length: %d, got: %d", ULID_LENGTH, value.length()));
         }
     }
 

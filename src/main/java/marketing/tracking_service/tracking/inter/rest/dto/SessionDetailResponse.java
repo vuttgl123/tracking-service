@@ -14,10 +14,7 @@ public record SessionDetailResponse(
         UtmView lastTouch,
         List<EventView> events
 ) {
-    public record UtmView(
-            String source, String medium, String campaign, String term, String content, String clickId,
-            Instant capturedAt
-    ) {}
+    public record UtmView(String source, String medium, String campaign, String term, String content, String clickId, Instant capturedAt) {}
 
     public record EventView(
             long eventId,

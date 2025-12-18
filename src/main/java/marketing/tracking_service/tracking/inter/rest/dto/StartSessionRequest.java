@@ -5,7 +5,6 @@ import lombok.Builder;
 
 @Builder
 public record StartSessionRequest(
-
         @JsonProperty("visitor_id")
         String visitorId,
 

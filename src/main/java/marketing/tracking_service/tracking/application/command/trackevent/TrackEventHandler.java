@@ -24,7 +24,6 @@ import java.time.Instant;
 @Service
 @RequiredArgsConstructor
 public class TrackEventHandler implements CommandHandler<TrackEventCommand, TrackEventResult> {
-
     private final IdGenerator idGenerator;
     private final Clock clock;
     private final VisitorRepository visitorRepository;
@@ -42,77 +41,49 @@ public class TrackEventHandler implements CommandHandler<TrackEventCommand, Trac
         SessionId sessionId = resolveSessionId(cmd.sessionId());
 
         Visitor visitor = getOrCreateVisitor(visitorId, cmd);
-        Visitor savedVisitor = visitorRepository.save(visitor);
+        visitorRepository.save(visitor);
 
-        IpHash ipHash = cmd.ipAddress() != null
-                ? IpHash.fromIpAddress(cmd.ipAddress())
-                : null;
-
-        DeviceInfo deviceInfo = deviceDetection.detect(
-                cmd.userAgent(),
-                cmd.screenWidth(),
-                cmd.screenHeight(),
-                cmd.language(),
-                cmd.timezone()
-        );
-
-        Session session = sessionLifecycle.getOrCreateSession(
-                sessionId,
-                visitorId,
-                ipHash,
-                cmd.userAgent(),
-                deviceInfo,
-                cmd.referrerUrl(),
-                cmd.landingUrl()
-        );
-
+        IpHash ipHash = cmd.ipAddress() != null ? IpHash.fromIpAddress(cmd.ipAddress()) : null;
+        DeviceInfo deviceInfo = deviceDetection.detect(cmd.userAgent(), cmd.screenWidth(), cmd.screenHeight(), cmd.language(), cmd.timezone());
+        Session session = (sessionId != null)
+                ? sessionLifecycle.getOrCreateSession(sessionId, visitorId, ipHash, cmd.userAgent(), deviceInfo, cmd.referrerUrl(), cmd.landingUrl())
+                : sessionLifecycle.startNewSession(visitorId, ipHash, cmd.userAgent(), deviceInfo, cmd.referrerUrl(), cmd.landingUrl());
         if (cmd.hasUtm()) {
             captureUtmAttribution(session, visitor, cmd);
         }
 
         TrackingEvent event = createTrackingEvent(session, visitor, cmd);
-
         try {
-            TrackingEvent savedEvent = eventRepository.save(event);
 
+            eventRepository.findBySessionAndClientEventId(session.getId(), cmd.clientEventId())
+                    .ifPresent(existing -> {
+                        throw new DuplicateEventException(existing.getId().toString(), existing.getClientEventId());
+                    });
+            TrackingEvent savedEvent = eventRepository.save(event);
             sessionLifecycle.recordActivity(session.getId());
             visitor.incrementEvents(1);
+
             if (cmd.eventType().isPageView()) {
                 visitor.incrementPageViews();
             }
-
-            visitorRepository.save(visitor);
 
             eventPublisher.publishFrom(savedEvent);
             eventPublisher.publishFrom(session);
             eventPublisher.publishFrom(visitor);
 
-            log.info("Event tracked: eventId={}, type={}, sessionId={}",
-                    savedEvent.getId(), cmd.eventType(), session.getId());
-
-            return TrackEventResult.success(
-                    visitor.getId().value(),
-                    session.getId().value(),
-                    savedEvent.getId(),
-                    savedEvent.getClientEventId()
-            );
+            log.info("Event tracked: eventId={}, type={}, sessionId={}", savedEvent.getId(), cmd.eventType(), session.getId());
+            return TrackEventResult.success(visitor.getId().value(), session.getId().value(), savedEvent.getId(), savedEvent.getClientEventId());
 
         } catch (DuplicateEventException e) {
-            log.warn("Duplicate event detected: sessionId={}, clientEventId={}",
-                    session.getId(), cmd.clientEventId());
-
-            return eventRepository.findBySessionAndClientEventId(
-                            session.getId(),
-                            cmd.clientEventId()
-                    )
+            log.warn("Duplicate event detected: sessionId={}, clientEventId={}", session.getId(), cmd.clientEventId());
+            return eventRepository.findBySessionAndClientEventId(session.getId(), cmd.clientEventId())
                     .map(existing -> TrackEventResult.duplicate(
                             visitor.getId().value(),
                             session.getId().value(),
                             existing.getId(),
                             existing.getClientEventId()
                     ))
-                    .orElseThrow(() -> new IllegalStateException(
-                            "Duplicate event but cannot find existing event"));
+                    .orElseThrow(() -> new IllegalStateException("Duplicate event but cannot find existing event"));
         }
     }
 
@@ -122,8 +93,7 @@ public class TrackEventHandler implements CommandHandler<TrackEventCommand, Trac
     }
 
     private SessionId resolveSessionId(String sessionIdStr) {
-        SessionId sessionId = SessionId.fromOrNull(sessionIdStr);
-        return sessionId != null ? sessionId : SessionId.from(idGenerator.newId());
+        return SessionId.fromOrNull(sessionIdStr);
     }
 
     private Visitor getOrCreateVisitor(VisitorId visitorId, TrackEventCommand cmd) {
@@ -151,14 +121,9 @@ public class TrackEventHandler implements CommandHandler<TrackEventCommand, Trac
         InteractionContext interactionContext = InteractionContext.builder()
                 .scrollDepth(cmd.scrollDepth())
                 .timeOnPage(cmd.timeOnPage())
-                .viewport(cmd.viewportWidth() != null && cmd.viewportHeight() != null
-                        ? new ViewportSize(cmd.viewportWidth(), cmd.viewportHeight())
-                        : null)
-                .element(cmd.elementId() != null || cmd.elementClass() != null
-                        ? new ElementInfo(cmd.elementId(), cmd.elementClass(), cmd.elementText())
-                        : null)
+                .viewport(cmd.viewportWidth() != null && cmd.viewportHeight() != null ? new ViewportSize(cmd.viewportWidth(), cmd.viewportHeight()) : null)
+                .element(cmd.elementId() != null || cmd.elementClass() != null ? new ElementInfo(cmd.elementId(), cmd.elementClass(), cmd.elementText()) : null)
                 .build();
-
         Instant eventAt = cmd.eventAt() != null ? cmd.eventAt() : clock.instant();
 
         return TrackingEvent.track(
@@ -191,13 +156,8 @@ public class TrackEventHandler implements CommandHandler<TrackEventCommand, Trac
 
         Instant now = clock.instant();
 
-        if (!utmRepository.findByVisitorAndTouchType(visitor.getId(), TouchType.FIRST).isPresent()) {
-            UtmAttribution firstTouch = UtmAttribution.captureFirstTouch(
-                    session.getId(),
-                    visitor.getId(),
-                    utmData,
-                    now
-            );
+        if (utmRepository.findByVisitorAndTouchType(visitor.getId(), TouchType.FIRST).isEmpty()) {
+            UtmAttribution firstTouch = UtmAttribution.captureFirstTouch(session.getId(), visitor.getId(), utmData, now);
             utmRepository.save(firstTouch);
         }
 

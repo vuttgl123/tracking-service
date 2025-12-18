@@ -37,39 +37,15 @@ public class StartSessionHandler implements CommandHandler<StartSessionCommand, 
 
         Visitor visitor = getOrCreateVisitor(visitorId, cmd);
 
-        IpHash ipHash = cmd.ipAddress() != null
-                ? IpHash.fromIpAddress(cmd.ipAddress())
-                : null;
-
-        DeviceInfo deviceInfo = deviceDetection.detect(
-                cmd.userAgent(),
-                cmd.screenWidth(),
-                cmd.screenHeight(),
-                cmd.language(),
-                cmd.timezone()
-        );
-
-        Session session = sessionLifecycle.getOrCreateSession(
-                sessionId,
-                visitorId,
-                ipHash,
-                cmd.userAgent(),
-                deviceInfo,
-                cmd.referrerUrl(),
-                cmd.landingUrl()
-        );
+        IpHash ipHash = cmd.ipAddress() != null ? IpHash.fromIpAddress(cmd.ipAddress()) : null;
+        DeviceInfo deviceInfo = deviceDetection.detect(cmd.userAgent(), cmd.screenWidth(), cmd.screenHeight(), cmd.language(), cmd.timezone());
+        Session session = sessionLifecycle.getOrCreateSession(sessionId, visitorId, ipHash, cmd.userAgent(), deviceInfo, cmd.referrerUrl(), cmd.landingUrl());
 
         eventPublisher.publishFrom(visitor);
         eventPublisher.publishFrom(session);
 
-        log.info("Session started: sessionId={}, visitorId={}",
-                session.getId(), visitor.getId());
-
-        return new StartSessionResult(
-                visitor.getId().value(),
-                session.getId().value(),
-                session.getStartedAt()
-        );
+        log.info("Session started: sessionId={}, visitorId={}", session.getId(), visitor.getId());
+        return new StartSessionResult(visitor.getId().value(), session.getId().value(), session.getStartedAt());
     }
 
     private VisitorId resolveVisitorId(String visitorIdStr) {

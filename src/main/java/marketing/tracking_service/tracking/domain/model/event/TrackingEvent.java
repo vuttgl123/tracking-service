@@ -17,7 +17,6 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TrackingEvent extends AggregateRoot<Long> {
-
     private SessionId sessionId;
     private VisitorId visitorId;
     private String clientEventId;
@@ -27,16 +26,7 @@ public class TrackingEvent extends AggregateRoot<Long> {
     private InteractionContext interactionContext;
     private Map<String, Object> metadata;
 
-    private TrackingEvent(
-            SessionId sessionId,
-            VisitorId visitorId,
-            String clientEventId,
-            TrackingEventType eventType,
-            Instant eventAt,
-            PageContext pageContext,
-            InteractionContext interactionContext,
-            Map<String, Object> metadata
-    ) {
+    private TrackingEvent(SessionId sessionId, VisitorId visitorId, String clientEventId, TrackingEventType eventType, Instant eventAt, PageContext pageContext, InteractionContext interactionContext, Map<String, Object> metadata) {
         super();
         this.sessionId = Objects.requireNonNull(sessionId);
         this.visitorId = Objects.requireNonNull(visitorId);
@@ -48,46 +38,16 @@ public class TrackingEvent extends AggregateRoot<Long> {
         this.metadata = metadata != null ? new HashMap<>(metadata) : new HashMap<>();
     }
 
-    public static TrackingEvent track(
-            SessionId sessionId,
-            VisitorId visitorId,
-            String clientEventId,
-            TrackingEventType eventType,
-            Instant eventAt,
-            PageContext pageContext,
-            InteractionContext interactionContext,
-            Map<String, Object> metadata
-    ) {
-        return new TrackingEvent(
-                sessionId,
-                visitorId,
-                clientEventId,
-                eventType,
-                eventAt,
-                pageContext,
-                interactionContext,
-                metadata
-        );
+    public static TrackingEvent track(SessionId sessionId, VisitorId visitorId, String clientEventId, TrackingEventType eventType, Instant eventAt, PageContext pageContext, InteractionContext interactionContext, Map<String, Object> metadata) {
+        return new TrackingEvent(sessionId, visitorId, clientEventId, eventType, eventAt, pageContext, interactionContext, metadata);
     }
 
     public void markAsPersisted(Long id) {
         if (isPersisted()) {
             throw new IllegalStateException("Event already persisted");
         }
-
         setId(id);
-
-        registerEvent(EventTracked.of(
-                id,
-                sessionId.value(),
-                visitorId.value(),
-                clientEventId,
-                eventType.name(),
-                eventAt,
-                pageContext.pageUrl(),
-                pageContext.pageTitle(),
-                metadata
-        ));
+        registerEvent(EventTracked.of(id, sessionId.value(), visitorId.value(), clientEventId, eventType.name(), eventAt, pageContext.pageUrl(), pageContext.pageTitle(), metadata));
     }
 
     public boolean isPageView() {

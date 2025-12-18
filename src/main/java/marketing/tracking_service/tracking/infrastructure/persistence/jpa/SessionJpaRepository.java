@@ -10,11 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SessionJpaRepository extends JpaRepository<SessionEntity, String> {
-
     List<SessionEntity> findByVisitorIdAndEndedAtIsNull(String visitorId);
-
     Optional<SessionEntity> findFirstByVisitorIdOrderByStartedAtDesc(String visitorId);
-
     @Query("""
         SELECT s FROM SessionEntity s 
         WHERE s.endedAt IS NULL 

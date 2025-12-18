@@ -19,22 +19,19 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 public class TrackingEventRepositoryAdapter implements TrackingEventRepository {
-
     private final EventJpaRepository jpaRepository;
     private final TrackingEventMapper mapper;
 
     @Override
     @Transactional(readOnly = true)
     public Optional<TrackingEvent> findById(Long id) {
-        return jpaRepository.findById(id)
-                .map(mapper::toDomain);
+        return jpaRepository.findById(id).map(mapper::toDomain);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<TrackingEvent> findBySessionAndClientEventId(SessionId sessionId, String clientEventId) {
-        return jpaRepository.findBySessionIdAndClientEventId(sessionId.value(), clientEventId)
-                .map(mapper::toDomain);
+        return jpaRepository.findBySessionIdAndClientEventId(sessionId.value(), clientEventId).map(mapper::toDomain);
     }
 
     @Override
@@ -60,10 +57,7 @@ public class TrackingEventRepositoryAdapter implements TrackingEventRepository {
 
         } catch (DataIntegrityViolationException ex) {
             if (isDuplicateKeyException(ex)) {
-                throw new DuplicateEventException(
-                        event.getSessionId().value(),
-                        event.getClientEventId()
-                );
+                throw new DuplicateEventException(event.getSessionId().value(), event.getClientEventId());
             }
             throw ex;
         }

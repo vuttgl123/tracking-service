@@ -7,7 +7,6 @@ import java.time.Instant;
 
 @Builder
 public record StartSessionResponse(
-
         @JsonProperty("visitor_id")
         String visitorId,
 
@@ -21,11 +20,7 @@ public record StartSessionResponse(
         String status
 ) {
 
-    public static StartSessionResponse success(
-            String visitorId,
-            String sessionId,
-            Instant startedAt
-    ) {
+    public static StartSessionResponse success(String visitorId, String sessionId, Instant startedAt) {
         return StartSessionResponse.builder()
                 .visitorId(visitorId)
                 .sessionId(sessionId)

@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 @Service
 public class UserAgentDeviceDetectionService implements DeviceDetectionService {
-
     private static final Pattern MOBILE_PATTERN = Pattern.compile(
             "(?i)(mobile|android|iphone|ipod|blackberry|windows phone)",
             Pattern.CASE_INSENSITIVE
@@ -67,13 +66,7 @@ public class UserAgentDeviceDetectionService implements DeviceDetectionService {
     );
 
     @Override
-    public DeviceInfo detect(
-            String userAgent,
-            Integer screenWidth,
-            Integer screenHeight,
-            String language,
-            String timezone
-    ) {
+    public DeviceInfo detect(String userAgent, Integer screenWidth, Integer screenHeight, String language, String timezone) {
         if (userAgent == null || userAgent.isBlank()) {
             return DeviceInfo.unknown();
         }
@@ -81,10 +74,7 @@ public class UserAgentDeviceDetectionService implements DeviceDetectionService {
         DeviceType deviceType = detectDeviceType(userAgent);
         BrowserInfo browserInfo = detectBrowser(userAgent);
         OsInfo osInfo = detectOs(userAgent);
-        ScreenResolution screenResolution = screenWidth != null && screenHeight != null
-                ? ScreenResolution.of(screenWidth, screenHeight)
-                : null;
-
+        ScreenResolution screenResolution = screenWidth != null && screenHeight != null ? ScreenResolution.of(screenWidth, screenHeight) : null;
         return DeviceInfo.builder()
                 .deviceType(deviceType)
                 .browser(browserInfo.name())

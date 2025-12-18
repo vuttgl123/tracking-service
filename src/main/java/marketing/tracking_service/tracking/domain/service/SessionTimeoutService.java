@@ -15,7 +15,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class SessionTimeoutService {
-
     private final SessionRepository sessionRepository;
 
     @Value("${tracking.session.timeout-minutes:30}")

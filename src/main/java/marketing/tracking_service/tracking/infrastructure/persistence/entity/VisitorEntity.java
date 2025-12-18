@@ -13,7 +13,6 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 public class VisitorEntity {
-
     @Id
     @Column(name = "visitor_id", length = 26, nullable = false)
     private String visitorId;

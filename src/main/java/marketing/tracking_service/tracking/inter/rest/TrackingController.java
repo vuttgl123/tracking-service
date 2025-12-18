@@ -11,8 +11,11 @@ import marketing.tracking_service.tracking.application.command.trackevent.TrackE
 import marketing.tracking_service.tracking.application.command.trackevent.TrackEventHandler;
 import marketing.tracking_service.tracking.application.command.trackevent.TrackEventResult;
 import marketing.tracking_service.tracking.inter.rest.dto.*;
+import marketing.tracking_service.tracking.inter.rest.mapper.StartSessionRequestMapper;
+import marketing.tracking_service.tracking.inter.rest.mapper.StartSessionResponseMapper;
 import marketing.tracking_service.tracking.inter.rest.mapper.TrackEventRequestMapper;
-import org.springframework.http.HttpStatus;
+import marketing.tracking_service.tracking.inter.rest.mapper.TrackEventResponseMapper;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,69 +24,35 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/tracking")
 @RequiredArgsConstructor
 public class TrackingController {
-
     private final TrackEventHandler trackEventHandler;
     private final StartSessionHandler startSessionHandler;
-    private final TrackEventRequestMapper requestMapper;
+    private final TrackEventRequestMapper trackEventRequestMapper;
+    private final TrackEventResponseMapper trackEventResponseMapper;
+    private final StartSessionRequestMapper startSessionRequestMapper;
+    private final StartSessionResponseMapper startSessionResponseMapper;
 
     @PostMapping("/events")
-    public ResponseEntity<TrackEventResponse> trackEvent(
-            @Valid @RequestBody TrackEventRequest request,
-            HttpServletRequest httpRequest
-    ) {
+    public ResponseEntity<TrackEventResponse> trackEvent(@Valid @RequestBody TrackEventRequest request, HttpServletRequest httpRequest) {
         String ipAddress = extractIpAddress(httpRequest);
         String userAgent = extractUserAgent(httpRequest);
 
-        TrackEventCommand command = requestMapper.toCommand(request, ipAddress, userAgent);
+        TrackEventCommand command = trackEventRequestMapper.toCommand(request, ipAddress, userAgent);
         TrackEventResult result = trackEventHandler.handle(command);
 
-        TrackEventResponse response = TrackEventResponse.success(
-                result.visitorId(),
-                result.sessionId(),
-                result.eventId(),
-                result.clientEventId(),
-                result.isDuplicate()
-        );
-
-        HttpStatus status = result.isDuplicate() ? HttpStatus.OK : HttpStatus.CREATED;
-
-        return ResponseEntity.status(status).body(response);
+        var api = trackEventResponseMapper.toApiResponse(result);
+        return ResponseEntity.status(api.status()).body(api.body());
     }
 
     @PostMapping("/sessions/start")
-    public ResponseEntity<StartSessionResponse> startSession(
-            @RequestBody StartSessionRequest request,
-            HttpServletRequest httpRequest
-    ) {
-        String ipAddress = request.ipAddress() != null
-                ? request.ipAddress()
-                : extractIpAddress(httpRequest);
-        String userAgent = request.userAgent() != null
-                ? request.userAgent()
-                : extractUserAgent(httpRequest);
+    public ResponseEntity<StartSessionResponse> startSession(@RequestBody StartSessionRequest request, HttpServletRequest httpRequest){
+        String ipAddress = extractIpAddress(httpRequest);
+        String userAgent = extractUserAgent(httpRequest);
 
-        StartSessionCommand command = StartSessionCommand.builder()
-                .visitorId(request.visitorId())
-                .sessionId(request.sessionId())
-                .ipAddress(ipAddress)
-                .userAgent(userAgent)
-                .screenWidth(request.screenWidth())
-                .screenHeight(request.screenHeight())
-                .language(request.language())
-                .timezone(request.timezone())
-                .referrerUrl(request.referrerUrl())
-                .landingUrl(request.landingUrl())
-                .build();
-
+        StartSessionCommand command = startSessionRequestMapper.toCommand(request, ipAddress, userAgent);
         StartSessionResult result = startSessionHandler.handle(command);
 
-        StartSessionResponse response = StartSessionResponse.success(
-                result.visitorId(),
-                result.sessionId(),
-                result.startedAt()
-        );
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        var api = startSessionResponseMapper.toApiResponse(result);
+        return ResponseEntity.status(api.status()).body(api.body());
     }
 
     @GetMapping("/health")

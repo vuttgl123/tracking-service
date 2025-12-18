@@ -10,7 +10,6 @@ import java.util.Map;
 
 @Builder
 public record TrackEventRequest(
-
         @JsonProperty("visitor_id")
         String visitorId,
 

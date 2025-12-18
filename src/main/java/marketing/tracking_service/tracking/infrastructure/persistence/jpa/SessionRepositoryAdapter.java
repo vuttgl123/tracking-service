@@ -18,15 +18,13 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 public class SessionRepositoryAdapter implements SessionRepository {
-
     private final SessionJpaRepository jpaRepository;
     private final SessionMapper mapper;
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Session> findById(SessionId id) {
-        return jpaRepository.findById(id.value())
-                .map(mapper::toDomain);
+        return jpaRepository.findById(id.value()).map(mapper::toDomain);
     }
 
     @Override
@@ -71,7 +69,6 @@ public class SessionRepositoryAdapter implements SessionRepository {
     @Override
     @Transactional(readOnly = true)
     public Optional<Session> findLatestByVisitor(VisitorId visitorId) {
-        return jpaRepository.findFirstByVisitorIdOrderByStartedAtDesc(visitorId.value())
-                .map(mapper::toDomain);
+        return jpaRepository.findFirstByVisitorIdOrderByStartedAtDesc(visitorId.value()).map(mapper::toDomain);
     }
 }

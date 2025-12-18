@@ -2,6 +2,7 @@ package marketing.tracking_service.tracking.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import marketing.tracking_service.tracking.infrastructure.persistence.converter.DeviceTypeEnumConverter;
 
 import java.time.Instant;
 
@@ -13,7 +14,6 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 public class SessionEntity {
-
     @Id
     @Column(name = "session_id", length = 26, nullable = false)
     private String sessionId;
@@ -37,7 +37,7 @@ public class SessionEntity {
     private String userAgent;
 
     @Column(name = "device_type", length = 20)
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = DeviceTypeEnumConverter.class)
     private DeviceTypeEnum deviceType;
 
     @Column(name = "browser", length = 50)

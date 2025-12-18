@@ -12,21 +12,11 @@ public record TrackEventResult(
         boolean isDuplicate
 ) implements Result {
 
-    public static TrackEventResult success(
-            String visitorId,
-            String sessionId,
-            Long eventId,
-            String clientEventId
-    ) {
+    public static TrackEventResult success(String visitorId, String sessionId, Long eventId, String clientEventId) {
         return new TrackEventResult(visitorId, sessionId, eventId, clientEventId, false);
     }
 
-    public static TrackEventResult duplicate(
-            String visitorId,
-            String sessionId,
-            Long eventId,
-            String clientEventId
-    ) {
+    public static TrackEventResult duplicate(String visitorId, String sessionId, Long eventId, String clientEventId) {
         return new TrackEventResult(visitorId, sessionId, eventId, clientEventId, true);
     }
 }
